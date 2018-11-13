@@ -19,14 +19,14 @@
 --     Initial Public Release
 --    
 --------------------------------------------------------------------------------
-
+--add in the package with addition
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
 ENTITY hw_image_generator IS
 	GENERIC(
-		pixels_y :	INTEGER := 100;    --row that first color will persist until
-		pixels_x	:	INTEGER := 400);   --column that first color will persist until
+		pixels_y :	INTEGER := 100; --100 	--bigger the y, wider the row
+		pixels_x	:	INTEGER := 400);--400	--bigger the x, longer the column
 	PORT(
 		disp_ena		:	IN		STD_LOGIC;	--display enable ('1' = display time, '0' = blanking time)
 		row			:	IN		INTEGER;		--row pixel coordinate
@@ -37,17 +37,35 @@ ENTITY hw_image_generator IS
 END hw_image_generator;
 
 ARCHITECTURE behavior OF hw_image_generator IS
+		--signal width1 : STD_LOGIC_VECTOR(9 downto 0);
+		--signal height : STD_LOGIC_VECTOR(9 downto 0);
 BEGIN
 	PROCESS(disp_ena, row, column)
 	BEGIN
-
+		
 		IF(disp_ena = '1') THEN		--display time
-			IF(row < pixels_y AND column < pixels_x) THEN
+			IF(row < pixels_y  AND column < pixels_x and row > 200) THEN 
+			
+				IF( row > 450 and row < 690 and column > 710 and column < 950) THEN				--user object
+					red <= (OTHERS => '1');--(OTHERS => '0')
+					green	<= (OTHERS => '1');
+					blue <= (OTHERS => '1');
+				ELSIF ( row > 940 and row < 980 and column > 50 and column < 350)	THEN			--yellow line one
+					red <= "11111111";
+					green	<= "11111111";
+					blue <= "01100110";
+				ELSIF ( row > 940 and row < 980 and column > 700 and column < 1000)	THEN		--yellow line two
+					red <= "11111111";
+					green	<= "11111111";
+					blue <= "01100110";
+				ELSE																									--rest of road
+					red <= "11000000";
+					green	<= "11000000";
+					blue <= "11000000";
+				end IF;
+				
+			ELSE																										--grass
 				red <= (OTHERS => '0');
-				green	<= (OTHERS => '0');
-				blue <= (OTHERS => '1');
-			ELSE
-				red <= (OTHERS => '1');
 				green	<= (OTHERS => '1');
 				blue <= (OTHERS => '0');
 			END IF;
