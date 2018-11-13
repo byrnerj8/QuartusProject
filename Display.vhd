@@ -99,8 +99,8 @@ SYNTHESIZED_WIRE_5 <= '0';
 
 
 b2v_inst : hw_image_generator
-GENERIC MAP(pixels_x => 478,
-			pixels_y => 600
+GENERIC MAP(pixels_x => 1200,  --478
+			pixels_y => 1700		--600
 			)
 PORT MAP(disp_ena => SYNTHESIZED_WIRE_0,
 		 column => SYNTHESIZED_WIRE_1,
