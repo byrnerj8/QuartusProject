@@ -25,6 +25,7 @@ LIBRARY work;
 ENTITY vga_with_hw_test_image IS 
 	PORT
 	(
+		testLED : OUT STD_LOGIC;
 		clk :  IN  STD_LOGIC;
 		pixel_clk :  OUT  STD_LOGIC;
 		h_sync :  OUT  STD_LOGIC;
@@ -53,7 +54,8 @@ GENERIC (pixels_x : INTEGER;
 			--obj_y2 : INTEGER
 			);
 			
-	PORT(disp_ena : IN STD_LOGIC;
+	PORT( testLED : OUT STD_LOGIC;
+		disp_ena : IN STD_LOGIC;
 		 column : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 		 row : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 		 blue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -110,7 +112,7 @@ COMPONENT ps2_keyboard
     ps2_code     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0));
 END COMPONENT;
 
-
+---------------------------      ------------------------------------------
 
 SIGNAL	SYNTHESIZED_WIRE_0 :  STD_LOGIC;
 SIGNAL	SYNTHESIZED_WIRE_1 :  STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -140,7 +142,8 @@ GENERIC MAP(pixels_x => 1200,  --478
 			--obj_x2 => 0,
 			--obj_y2 => 0
 			)
-PORT MAP(disp_ena => SYNTHESIZED_WIRE_0,
+PORT MAP( testLED => testLED,
+		 disp_ena => SYNTHESIZED_WIRE_0,
 		 column => SYNTHESIZED_WIRE_1,
 		 row => SYNTHESIZED_WIRE_2,
 		 blue => blue,
