@@ -34,7 +34,7 @@ ENTITY vga_controller IS
 		h_pol		:	STD_LOGIC := '0';		--horizontal sync pulse polarity (1 = positive, 0 = negative)
 		v_pulse 	:	INTEGER := 3;			--vertical sync pulse width in rows
 		v_bp	 	:	INTEGER := 38;			--vertical back porch width in rows
-		v_pixels	:	INTEGER := 1200;		--vertical display width in rows
+		v_pixels	:	INTEGER := 1200;--1080		--vertical display width in rows
 		v_fp	 	:	INTEGER := 1;			--vertical front porch width in rows
 		v_pol		:	STD_LOGIC := '1');	--vertical sync pulse polarity (1 = positive, 0 = negative)
 	PORT(

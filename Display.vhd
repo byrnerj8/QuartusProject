@@ -47,6 +47,10 @@ GENERIC (pixels_x : INTEGER;
 			pixels_y : INTEGER;
 			location_x : INTEGER;
 			location_y : INTEGER
+			--obj_x1 : INTEGER;
+			--obj_y1 : INTEGER;
+			--obj_x2 : INTEGER;
+			--obj_y2 : INTEGER
 			);
 			
 	PORT(disp_ena : IN STD_LOGIC;
@@ -131,6 +135,10 @@ GENERIC MAP(pixels_x => 1200,  --478
 			pixels_y => 1700,		--600
 			location_x => 450,
 			location_y => 710
+			--obj_x1 => 0,
+			--obj_y1 => 0,
+			--obj_x2 => 0,
+			--obj_y2 => 0
 			)
 PORT MAP(disp_ena => SYNTHESIZED_WIRE_0,
 		 column => SYNTHESIZED_WIRE_1,
