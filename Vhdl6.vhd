@@ -28,14 +28,15 @@ use IEEE.STD_LOGIC_UNSIGNED.all;
 
 ENTITY hw_image_generator IS
 	GENERIC(
-		pixels_y :	INTEGER := 1700; --100 	--bigger the y, wider the row
-		pixels_x	:	INTEGER := 1200;--400	--bigger the x, longer the column
-		location_x : INTEGER := 450;
-		location_y : INTEGER := 710
+		pixels_y :	INTEGER := 1700; 	--bigger the y, wider the row
+		pixels_x	:	INTEGER := 1200	--bigger the x, longer the column
+		--location_x : INTEGER := 450;
+		--location_y : INTEGER := 710
 		
 		);
 		
 	PORT(
+		testLED 		:  OUT 	STD_LOGIC;
 		disp_ena		:	IN		STD_LOGIC;	--display enable ('1' = display time, '0' = blanking time)
 		row			:	IN		INTEGER;		--row pixel coordinate
 		column		:	IN		INTEGER;		--column pixel coordinate
@@ -51,7 +52,8 @@ END hw_image_generator;
 ARCHITECTURE behavior OF hw_image_generator IS
 
 	SIGNAL xloc : INTEGER RANGE 0 TO (pixels_y) := 450;
-	signal counter : INTEGER := 0;  					-- signal that does the clock counting //std_logic_vector--(24 downto 0);
+	SIGNAL yloc : INTEGER RANGE 0 TO (pixels_x) := 710;
+	signal counter : INTEGER := 200;  					-- signal that does the clock counting //std_logic_vector--(24 downto 0);
 	signal timer : std_logic_vector(24 downto 0);
    signal CLK_1HZ : std_logic;
 	signal e1 : std_logic := '1';
@@ -59,7 +61,8 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal obj_x1 : INTEGER := 400;
 	signal obj_y1 : INTEGER := 0;
 	signal obj_x2 : INTEGER := 800;
-	signal obj_y2 : INTEGER := 0;
+	signal obj_y2 : INTEGER := 1;
+	signal collide : std_logic := '0';
 
 		
 BEGIN
@@ -70,15 +73,15 @@ BEGIN
 			
 			IF(row < pixels_y  AND column < pixels_x and row > 200) THEN 
 			
-				IF( row > xloc and row < xloc+240 and column > location_y and column < location_y+240) THEN				--user object
+				IF( row > xloc and row < xloc+240 and column > yloc and column < yloc+240) THEN				--user object
 					red <= (OTHERS => '1');--(OTHERS => '0')
 					green	<= (OTHERS => '1');
 					blue <= (OTHERS => '1');
-				ElSIF( row > obj_x1+200 and row < obj_x1+440 and column > obj_y1 and column < obj_y1+240 and e1 ='1') THEN				--object 1
+				ElSIF( row > obj_x1 and row < obj_x1+240 and column > obj_y1 and column < obj_y1+240 and e1 ='1') THEN--obj_x1+200				--object 1
 					red <= (OTHERS => '1');
 					green	<= (OTHERS => '0');
 					blue <= (OTHERS => '1');
-				ElSIF( row > obj_x2+200 and row < obj_x2+440 and column > obj_y2 and column < obj_y2+240 and e2 ='1') THEN				--object 2
+				ElSIF( row > obj_x2 and row < obj_x2+240 and column > obj_y2 and column < obj_y2+240 and e2 ='1') THEN--obj_x2+200 and obj_x2+440	--object 2
 					red <= (OTHERS => '1');
 					green	<= (OTHERS => '0');
 					blue <= (OTHERS => '1');
@@ -113,11 +116,11 @@ BEGIN
    begin  -- process Prescaler
 
       if clk'event and clk = '1' then  													
-         if counter < 1280 then  								
+         if counter < 1460 then  		 						
 																										
             counter <= counter + 1;
          else 
-            counter <= 0;
+            counter <= 200;  
          end if;
 			
 			if timer < "000010111110101111000010" then			-- rising clock edge    "101111101011110000100000"
@@ -125,57 +128,122 @@ BEGIN
 			else
 				timer <= (OTHERS => '0');
 				CLK_1Hz <= not CLK_1Hz;
-				
 			end if;
+						
 		end if;
+		
+			
    end process Prescaler;
 	
 	
 	PROCESS(CLK_1Hz)
 	begin
 	
-		if CLK_1Hz'event and CLK_1Hz = '1' then 
+		if CLK_1Hz'event and CLK_1Hz = '1' and collide = '0' then 	--we could put all of this in the process above to avoid jumping at the top of the screen
 			if e1 = '0' then																			--give values for object 1
 				obj_x1 <= counter;
-				if ((obj_x2 < obj_x1 and obj_x2+240 > obj_x1)) then				--e2 = '1' and 
-					if(obj_x1 > 1040) then
-						obj_x1 <= obj_x1 - 240;
-					else
-						obj_x1 <= obj_x1	 + 240;
-					end if;
-				end if;
-					
 				obj_y1 <= 0;
 				e1 <= '1';
-				
-			end if;
-		
+			END IF;
+			
 			if  e2 = '0' then																			--give values for object 2
 				obj_x2 <= counter;
-				if ((obj_x1 < obj_x2 and obj_x1+240 > obj_x2)) then						--e1 = '1' and 
-					if(obj_x2 > 1040) then
-						obj_x2 <= obj_x2 - 240;
+				obj_y2 <= 1;
+				e2 <= '1';
+			END IF;
+			
+			if (obj_x1 < obj_x2 and obj_x1 + 240 > obj_x2) then
+			
+				if (obj_y2 < obj_y1) then
+					if(obj_x1 < 960) then
+						obj_x2 <= obj_x2 + 245;
 					else
-						obj_x2 <= obj_x2	 + 240;
+						obj_x2 <= obj_x2 - 490;
+					end if;
+				else
+					if (obj_x1 < 960) then
+						obj_x1 <= obj_x1 + 490;
+					else
+						obj_x1 <= obj_x1 - 245;
 					end if;
 				end if;
-					
-				obj_y2 <= 0;
-				e2 <= '1';
-			end if;
+				
 			
-			if(e1 = '1' and obj_y1 >= 1080) then
+			elsif (obj_x1 > obj_x2  and obj_x1 < obj_x2 + 240 ) then
+			
+				if( obj_y2 < obj_y1) then
+					if(obj_x2 < 960) then
+						obj_x2 <= obj_x2 + 490;
+					else
+						obj_x2 <= obj_x2 - 245;
+					end if;
+				else
+					if(obj_x2 < 960) then
+						obj_x1 <= obj_x1 + 245;
+					else
+						obj_x1 <= obj_x1 - 490;
+					end if;
+				end if;
+				
+			elsif(obj_x1 = obj_x2) then
+			
+				if( obj_y2 < obj_y1) then
+					if(obj_x2 < 960) then
+						obj_x2 <= obj_x2 + 250;
+					else
+						obj_x2 <= obj_x2 - 300;
+					end if;
+				else
+					if(obj_x2 < 960) then
+						obj_x1 <= obj_x1 + 250;
+					else
+						obj_x1 <= obj_x1 - 300;
+					end if;
+				end if;
+			end if;	
+			
+			
+			if(e1 = '1' and obj_y1 >= 1080) then		--object one is off screen
 				e1 <= '0';
 				obj_y1 <= 0;
-			elsif(e2 = '1' and obj_y2 >= 1080) then
+				testLED <= '0';
+			elsif(e2 = '1' and obj_y2 >= 1080) then	--object two is off screen
 				e2 <= '0';
 				obj_y2 <= 0;
-			else
-				obj_y1 <= obj_y1 + 4;
-				obj_y2 <= obj_y2 + 3;
+			else													--speed of the objects
+				obj_y1 <= obj_y1 + 7;--4   7						--moves object one down
+				obj_y2 <= obj_y2 + 4;--3						--moves object two down
 			end if;
-		end if;
 		
+		
+			if(obj_x1 + 240 > xloc and obj_x1 < xloc and obj_y1 +240 > yloc and obj_y1 < yloc) then				---This tests collision with the first object
+				testLED <= '1';
+				collide <= '1';
+			elsif(obj_x1 + 240 > xloc and obj_x1 < xloc and obj_y1 - 240 < yloc and obj_y1 > yloc) then
+				testLED <= '1';
+				collide <= '1';
+			elsif(obj_x1 - 240 < xloc and obj_x1 > xloc and obj_y1 - 240 < yloc and obj_y1 > yloc) then
+				testLED <= '1';
+				collide <= '1';
+			elsif(obj_x1 - 240 < xloc and obj_x1 > xloc and obj_y1 +240 > yloc and obj_y1 < yloc) then
+				testLED <= '1';
+				collide <= '1';
+			end if;
+			
+			if(obj_x2 + 240 > xloc and obj_x2 < xloc and obj_y2 +240 > yloc and obj_y2 < yloc) then				---This tests collision with the first object
+				testLED <= '1';
+				collide <= '1';
+			elsif(obj_x2 + 240 > xloc and obj_x2 < xloc and obj_y2 - 240 < yloc and obj_y2 > yloc) then
+				testLED <= '1';
+				collide <= '1';
+			elsif(obj_x2 - 240 < xloc and obj_x2 > xloc and obj_y2 - 240 < yloc and obj_y2 > yloc) then
+				testLED <= '1';
+				collide <= '1';
+			elsif(obj_x2 - 240 < xloc and obj_x2 > xloc and obj_y2 +240 > yloc and obj_y2 < yloc) then
+				testLED <= '1';
+				collide <= '1';
+			end if;
+		end if;	
 	end process;
 	
 
@@ -186,7 +254,7 @@ BEGIN
 	PROCESS(ps2_code_new, ps2_code)															--This process moves the user block
 	BEGIN	
 --		IF(CLK_1HZ'EVENT AND CLK_1HZ = '1') THEN
-		IF(ps2_code_new'EVENT AND ps2_code_new = '1') THEN
+		IF(ps2_code_new'EVENT AND ps2_code_new = '1' AND collide = '0') THEN
 			IF(ps2_code = "00110100") THEN													--g key moves left
 				IF(xloc <= 200) THEN
 					xloc <= 200;

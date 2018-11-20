@@ -25,6 +25,7 @@ LIBRARY work;
 ENTITY vga_with_hw_test_image IS 
 	PORT
 	(
+		testLED : OUT STD_LOGIC;
 		clk :  IN  STD_LOGIC;
 		pixel_clk :  OUT  STD_LOGIC;
 		h_sync :  OUT  STD_LOGIC;
@@ -44,16 +45,17 @@ ARCHITECTURE bdf_type OF vga_with_hw_test_image IS
 ---------------- COMPONENTS OF IMAGE GENERATOR-----------------------
 COMPONENT hw_image_generator
 GENERIC (pixels_x : INTEGER;
-			pixels_y : INTEGER;
-			location_x : INTEGER;
-			location_y : INTEGER
+			pixels_y : INTEGER
+			--location_x : INTEGER;
+			--location_y : INTEGER
 			--obj_x1 : INTEGER;
 			--obj_y1 : INTEGER;
 			--obj_x2 : INTEGER;
 			--obj_y2 : INTEGER
 			);
 			
-	PORT(disp_ena : IN STD_LOGIC;
+	PORT( testLED : OUT STD_LOGIC;
+		disp_ena : IN STD_LOGIC;
 		 column : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 		 row : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 		 blue : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
@@ -110,7 +112,7 @@ COMPONENT ps2_keyboard
     ps2_code     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0));
 END COMPONENT;
 
-
+---------------------------      ------------------------------------------
 
 SIGNAL	SYNTHESIZED_WIRE_0 :  STD_LOGIC;
 SIGNAL	SYNTHESIZED_WIRE_1 :  STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -132,15 +134,16 @@ SYNTHESIZED_WIRE_5 <= '0';
 
 b2v_inst : hw_image_generator
 GENERIC MAP(pixels_x => 1200,  --478
-			pixels_y => 1700,		--600
-			location_x => 450,
-			location_y => 710
+			pixels_y => 1700		--600
+			--location_x => 450,
+			--location_y => 710
 			--obj_x1 => 0,
 			--obj_y1 => 0,
 			--obj_x2 => 0,
 			--obj_y2 => 0
 			)
-PORT MAP(disp_ena => SYNTHESIZED_WIRE_0,
+PORT MAP( testLED => testLED,
+		 disp_ena => SYNTHESIZED_WIRE_0,
 		 column => SYNTHESIZED_WIRE_1,
 		 row => SYNTHESIZED_WIRE_2,
 		 blue => blue,
