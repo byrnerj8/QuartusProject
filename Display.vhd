@@ -26,6 +26,7 @@ ENTITY vga_with_hw_test_image IS
 	PORT
 	(
 		testLED : OUT STD_LOGIC;
+		score1 :  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0);
 		clk :  IN  STD_LOGIC;
 		pixel_clk :  OUT  STD_LOGIC;
 		h_sync :  OUT  STD_LOGIC;
@@ -55,6 +56,7 @@ GENERIC (pixels_x : INTEGER;
 			);
 			
 	PORT( testLED : OUT STD_LOGIC;
+		score1 :  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0);
 		disp_ena : IN STD_LOGIC;
 		 column : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 		 row : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -143,6 +145,7 @@ GENERIC MAP(pixels_x => 1200,  --478
 			--obj_y2 => 0
 			)
 PORT MAP( testLED => testLED,
+			score1 => score1,
 		 disp_ena => SYNTHESIZED_WIRE_0,
 		 column => SYNTHESIZED_WIRE_1,
 		 row => SYNTHESIZED_WIRE_2,

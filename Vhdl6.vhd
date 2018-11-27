@@ -37,6 +37,7 @@ ENTITY hw_image_generator IS
 		
 	PORT(
 		testLED 		:  OUT 	STD_LOGIC;
+		score1 		:  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0) ;--:= "0000001";
 		disp_ena		:	IN		STD_LOGIC;	--display enable ('1' = display time, '0' = blanking time)
 		row			:	IN		INTEGER;		--row pixel coordinate
 		column		:	IN		INTEGER;		--column pixel coordinate
@@ -63,6 +64,8 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal obj_x2 : INTEGER := 800;
 	signal obj_y2 : INTEGER := 1;
 	signal collide : std_logic := '0';
+	signal scoreCount : std_logic := '0';
+	signal s1 : std_logic_vector(6 downto 0) := "0000001";
 
 		
 BEGIN
@@ -104,7 +107,7 @@ BEGIN
 				green	<= (OTHERS => '1');
 				blue <= (OTHERS => '0');
 			END IF;
-		ELSE								--blanking time
+		ELSE															--blanking time
 			red <= (OTHERS => '0');
 			green <= (OTHERS => '0');
 			blue <= (OTHERS => '0');
@@ -112,22 +115,26 @@ BEGIN
 	
 	END PROCESS;
 	
+	--Process involves clock values
 	Prescaler: process (clk)
-   begin  -- process Prescaler
+   begin  
 
       if clk'event and clk = '1' then  													
-         if counter < 1460 then  		 						
+         if counter < 1460 then  								--the counter randomly assigns a possition to the falling objects	 						
 																										
             counter <= counter + 1;
          else 
             counter <= 200;  
          end if;
-			
-			if timer < "000010111110101111000010" then			-- rising clock edge    "101111101011110000100000"
-				timer <= timer + 1;										-- Binary value is 25e6/16   (16 cycle per second)
-			else
+																			--timer will give pace for our CLK_1Hz variable
+			if timer < "000010111110101111000010" then		-- rising clock edge    "101111101011110000100000"
+				timer <= timer + 1;									-- Binary value is 25e6/16   (16 cycle per second)
+			else																
 				timer <= (OTHERS => '0');
 				CLK_1Hz <= not CLK_1Hz;
+				if collide = '0' then
+					scoreCount <= '1';									--ready for next score
+				end if;
 			end if;
 						
 		end if;
@@ -135,23 +142,28 @@ BEGIN
 			
    end process Prescaler;
 	
-	
+	--testLED <= '1';
+	--Process moves everything
 	PROCESS(CLK_1Hz)
 	begin
 	
+	
 		if CLK_1Hz'event and CLK_1Hz = '1' and collide = '0' then 	--we could put all of this in the process above to avoid jumping at the top of the screen
-			if e1 = '0' then																			--give values for object 1
+			--give values for object 1
+			if e1 = '0' then																			
 				obj_x1 <= counter;
 				obj_y1 <= 0;
 				e1 <= '1';
 			END IF;
 			
-			if  e2 = '0' then																			--give values for object 2
+			--give values for object 2
+			if  e2 = '0' then																			
 				obj_x2 <= counter;
 				obj_y2 <= 1;
 				e2 <= '1';
 			END IF;
 			
+			--checks for overlap of falling objects
 			if (obj_x1 < obj_x2 and obj_x1 + 240 > obj_x2) then
 			
 				if (obj_y2 < obj_y1) then
@@ -168,7 +180,6 @@ BEGIN
 					end if;
 				end if;
 				
-			
 			elsif (obj_x1 > obj_x2  and obj_x1 < obj_x2 + 240 ) then
 			
 				if( obj_y2 < obj_y1) then
@@ -202,7 +213,7 @@ BEGIN
 				end if;
 			end if;	
 			
-			
+			--controls objects moving down the screen
 			if(e1 = '1' and obj_y1 >= 1080) then		--object one is off screen
 				e1 <= '0';
 				obj_y1 <= 0;
@@ -215,43 +226,60 @@ BEGIN
 				obj_y2 <= obj_y2 + 4;--3						--moves object two down
 			end if;
 		
-		
-			if(obj_x1 + 240 > xloc and obj_x1 < xloc and obj_y1 +240 > yloc and obj_y1 < yloc) then				---This tests collision with the first object
-				testLED <= '1';
+			--tests object 1 for collisions
+			if(obj_x1 + 240 > xloc and obj_x1 < xloc and obj_y1 +240 > yloc and obj_y1 < yloc) then				
 				collide <= '1';
 			elsif(obj_x1 + 240 > xloc and obj_x1 < xloc and obj_y1 - 240 < yloc and obj_y1 > yloc) then
-				testLED <= '1';
 				collide <= '1';
 			elsif(obj_x1 - 240 < xloc and obj_x1 > xloc and obj_y1 - 240 < yloc and obj_y1 > yloc) then
-				testLED <= '1';
 				collide <= '1';
 			elsif(obj_x1 - 240 < xloc and obj_x1 > xloc and obj_y1 +240 > yloc and obj_y1 < yloc) then
-				testLED <= '1';
 				collide <= '1';
 			end if;
 			
-			if(obj_x2 + 240 > xloc and obj_x2 < xloc and obj_y2 +240 > yloc and obj_y2 < yloc) then				---This tests collision with the first object
-				testLED <= '1';
+			--tests object 2 for collisions
+			if(obj_x2 + 240 > xloc and obj_x2 < xloc and obj_y2 +240 > yloc and obj_y2 < yloc) then				
 				collide <= '1';
 			elsif(obj_x2 + 240 > xloc and obj_x2 < xloc and obj_y2 - 240 < yloc and obj_y2 > yloc) then
-				testLED <= '1';
 				collide <= '1';
 			elsif(obj_x2 - 240 < xloc and obj_x2 > xloc and obj_y2 - 240 < yloc and obj_y2 > yloc) then
-				testLED <= '1';
 				collide <= '1';
 			elsif(obj_x2 - 240 < xloc and obj_x2 > xloc and obj_y2 +240 > yloc and obj_y2 < yloc) then
-				testLED <= '1';
 				collide <= '1';
 			end if;
+		
+--			if scoreCount = '1' then
+--				if s1 = "0001100" then				--0
+--					s1 <= "0000001";
+--				elsif s1 = "0000001" then			--1
+--					s1 <= "1001111";
+--				elsif s1 = "1001111" then			--2
+--					s1 <= "0010010";
+--				elsif s1 = "0010010" then			--3
+--					s1 <= "0000110";
+--				elsif s1 = "0000110" then			--4
+--					s1 <= "1001100";
+--				elsif s1 = "1001100" then			--5
+--					s1 <= "0100100";
+--				elsif s1 = "0100100" then			--6
+--					s1 <= "0100000";
+--				elsif s1 = "0100000" then			--7
+--					s1 <= "0001111";
+--				elsif s1 = "0001111" then			--8
+--					s1 <= "0000000";
+--				elsif s1 = "0000000" then			--9
+--					s1 <= "0001100";
+--				end if;
+--			scoreCount <= '0';
+--			score1 <= s1;
+--			end if;
 		end if;	
 	end process;
 	
-
-
 	
 	
-	
-	PROCESS(ps2_code_new, ps2_code)															--This process moves the user block
+	--This process moves the user block
+	PROCESS(ps2_code_new, ps2_code)															
 	BEGIN	
 --		IF(CLK_1HZ'EVENT AND CLK_1HZ = '1') THEN
 		IF(ps2_code_new'EVENT AND ps2_code_new = '1' AND collide = '0') THEN
