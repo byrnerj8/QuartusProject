@@ -37,7 +37,7 @@ ENTITY hw_image_generator IS
 		
 	PORT(
 		testLED 		:  OUT 	STD_LOGIC;
-		score1 		:  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0) ;--:= "0000001";
+		score1 		:  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000001";
 		disp_ena		:	IN		STD_LOGIC;	--display enable ('1' = display time, '0' = blanking time)
 		row			:	IN		INTEGER;		--row pixel coordinate
 		column		:	IN		INTEGER;		--column pixel coordinate
@@ -64,7 +64,7 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal obj_x2 : INTEGER := 800;
 	signal obj_y2 : INTEGER := 1;
 	signal collide : std_logic := '0';
-	signal scoreCount : std_logic := '0';
+	signal scoreCount : std_logic_vector(2 downto 0) := "000";
 	signal s1 : std_logic_vector(6 downto 0) := "0000001";
 
 		
@@ -132,9 +132,9 @@ BEGIN
 			else																
 				timer <= (OTHERS => '0');
 				CLK_1Hz <= not CLK_1Hz;
-				if collide = '0' then
-					scoreCount <= '1';									--ready for next score
-				end if;
+				--if collide = '0' then
+					--scoreCount <= "01";									--ready for next score
+				--end if;
 			end if;
 						
 		end if;
@@ -248,31 +248,50 @@ BEGIN
 				collide <= '1';
 			end if;
 		
---			if scoreCount = '1' then
---				if s1 = "0001100" then				--0
---					s1 <= "0000001";
---				elsif s1 = "0000001" then			--1
---					s1 <= "1001111";
---				elsif s1 = "1001111" then			--2
---					s1 <= "0010010";
---				elsif s1 = "0010010" then			--3
---					s1 <= "0000110";
---				elsif s1 = "0000110" then			--4
---					s1 <= "1001100";
---				elsif s1 = "1001100" then			--5
---					s1 <= "0100100";
---				elsif s1 = "0100100" then			--6
---					s1 <= "0100000";
---				elsif s1 = "0100000" then			--7
---					s1 <= "0001111";
---				elsif s1 = "0001111" then			--8
---					s1 <= "0000000";
---				elsif s1 = "0000000" then			--9
---					s1 <= "0001100";
---				end if;
---			scoreCount <= '0';
---			score1 <= s1;
---			end if;
+			scoreCount <= scoreCount + 1;
+			if scoreCount = "111" then
+				if s1 = "0001100" then				--0
+					score1 <= "0000001";
+					s1 <= "0000001";
+					--scoreCount <= "00";
+				elsif s1 = "0000001" then			--1
+					score1 <= "1001111";
+					s1 <= "1001111";
+					--scoreCount <= '0';
+				elsif s1 = "1001111" then			--2
+					score1 <= "0010010";
+					s1 <= "0010010";
+					--scoreCount <= '0';
+				elsif s1 = "0010010" then			--3
+					score1 <= "0000110";
+					s1 <= "0000110";
+					--scoreCount <= '0';
+				elsif s1 = "0000110" then			--4
+					score1 <= "1001100";
+					s1 <= "1001100";
+					--scoreCount <= '0';
+				elsif s1 = "1001100" then			--5
+					score1 <= "0100100";
+					s1 <= "0100100";
+					--scoreCount <= '0';
+				elsif s1 = "0100100" then			--6
+					score1 <= "0100000";
+					s1 <= "0100000";
+					--scoreCount <= '0';
+				elsif s1 = "0100000" then			--7
+					score1 <= "0001111";
+					s1 <= "0001111";
+					--scoreCount <= '0';
+				elsif s1 = "0001111" then			--8
+					score1 <= "0000000";
+					s1 <= "0000000";
+					--scoreCount <= '0';
+				elsif s1 = "0000000" then			--9
+					score1 <= "0001100";
+					s1 <= "0001100";
+					--scoreCount <= '0';
+				end if;
+			end if;
 		end if;	
 	end process;
 	
