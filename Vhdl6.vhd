@@ -75,6 +75,9 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal start	: std_logic := '1';
 	signal prevStart : std_logic := '1';
 	signal reset	: std_logic := '0';
+	signal lineloc1 : INTEGER RANGE -300 TO (pixels_y) := 50;
+	signal lineloc2 : INTEGER RANGE -300 TO (pixels_y) := 700;
+	signal difficulty : INTEGER RANGE 0 TO 10 := 0;
 		
 BEGIN
 	PROCESS(disp_ena, row, column)
@@ -90,22 +93,64 @@ BEGIN
 			IF(row < pixels_y  AND column < pixels_x and row > 200) THEN 
 			
 				IF( row > xloc and row < xloc+240 and column > yloc and column < yloc+240) THEN				--user object
-					red <= (OTHERS => '1');--(OTHERS => '0')
-					green	<= (OTHERS => '1');
-					blue <= (OTHERS => '1');
+					if( row > xloc + 30 and row < xloc+210 and column > yloc + 40 and column < yloc+90 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '1');
+						blue <= (OTHERS => '1');
+					elsif(( row < xloc + 20 or row > xloc+220) and column > yloc + 10 and column < yloc+50 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					elsif(( row < xloc + 20 or row > xloc+220) and column > yloc + 190 and column < yloc+230 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					else
+						red <= (OTHERS => '1');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					end if;
 				ElSIF( row > obj_x1 and row < obj_x1+240 and column > obj_y1 and column < obj_y1+240 and e1 ='1') THEN--obj_x1+200				--object 1
-					red <= (OTHERS => '1');
-					green	<= (OTHERS => '0');
-					blue <= (OTHERS => '1');
+					if( row > obj_x1 + 30 and row < obj_x1+210 and column > obj_y1 + 40 and column < obj_y1+90 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '1');
+						blue <= (OTHERS => '1');
+					elsif(( row < obj_x1 + 20 or row > obj_x1+220) and column > obj_y1 + 10 and column < obj_y1+50 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					elsif(( row < obj_x1 + 20 or row > obj_x1+220) and column > obj_y1 + 190 and column < obj_y1+230 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					else
+						red <= (OTHERS => '1');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '1');
+					end if;
 				ElSIF( row > obj_x2 and row < obj_x2+240 and column > obj_y2 and column < obj_y2+240 and e2 ='1') THEN--obj_x2+200 and obj_x2+440	--object 2
-					red <= (OTHERS => '1');
-					green	<= (OTHERS => '0');
-					blue <= (OTHERS => '1');
-				ELSIF ( row > 940 and row < 980 and column > 50 and column < 350)	THEN			--yellow line one
+					if( row > obj_x2 + 30 and row < obj_x2+210 and column > obj_y2 + 40 and column < obj_y2+90 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '1');
+						blue <= (OTHERS => '1');
+					elsif(( row < obj_x2 + 20 or row > obj_x2+220) and column > obj_y2 + 10 and column < obj_y2+50 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					elsif(( row < obj_x2 + 20 or row > obj_x2+220) and column > obj_y2 + 190 and column < obj_y2+230 ) then
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					else
+						red <= (OTHERS => '1');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '1');
+					end if;
+				ELSIF ( row > 940 and row < 980 and column > lineloc1 and column < lineloc1 + 300)	THEN			--yellow line one
 					red <= "11111111";
 					green	<= "11111111";
 					blue <= "01100110";
-				ELSIF ( row > 940 and row < 980 and column > 700 and column < 1000)	THEN		--yellow line two
+				ELSIF ( row > 940 and row < 980 and column > lineloc2 and column < lineloc2 + 300)	THEN		--yellow line two
 					red <= "11111111";
 					green	<= "11111111";
 					blue <= "01100110";
@@ -114,6 +159,7 @@ BEGIN
 					green	<= "11000000";
 					blue <= "11000000";
 				end IF;
+			
 				
 			ELSE																										--grass
 				red <= (OTHERS => '0');
@@ -266,9 +312,22 @@ BEGIN
 				e2 <= '0';
 				obj_y2 <= 0;
 			else													--speed of the objects
-				obj_y1 <= obj_y1 + 7;--4   7						--moves object one down
-				obj_y2 <= obj_y2 + 4;--3						--moves object two down
+				obj_y1 <= obj_y1 + 6 + difficulty;--4   7						--moves object one down
+				obj_y2 <= obj_y2 + 5 + difficulty;--3						--moves object two down
 			end if;
+			
+			--moves yellow lines
+			IF(lineloc1 > 1080) then
+				lineloc1 <= -300;
+			else
+				lineloc1 <= lineloc1 + 10 + difficulty;
+			end if;
+			if(lineloc2 > 1080)then
+				lineloc2 <= -300;
+			else
+				lineloc2 <= lineloc2 + 10 + difficulty;
+			end if;
+			
 		
 			--tests object 1 for collisions
 			if(obj_x1 + 240 > xloc and obj_x1 < xloc and obj_y1 +240 > yloc and obj_y1 < yloc) then				
@@ -368,6 +427,7 @@ BEGIN
 				
 				--setting tens place
 				if	s1 = "0001100" then					--if ones place is 9
+					difficulty <= difficulty + 1;
 					if s2 = "0001100" then				--00
 						score2 <= "0000001";
 						s2 <= "0000001";
