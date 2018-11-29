@@ -230,6 +230,7 @@ BEGIN
 		 score4 <= "0000001";
 		 scoreCount <= "000";
 		 prevStart <= '1';
+		 difficulty <= 0;
 	  end if;
 			
 			if prevStart = '1' and start = '0' then
