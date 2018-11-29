@@ -38,6 +38,9 @@ ENTITY hw_image_generator IS
 	PORT(
 		testLED 		:  OUT 	STD_LOGIC;
 		score1 		:  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000001";
+		score2 		:  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000001";
+		score3 		:  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000001";
+		score4 		:  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0) := "0000001";
 		disp_ena		:	IN		STD_LOGIC;	--display enable ('1' = display time, '0' = blanking time)
 		row			:	IN		INTEGER;		--row pixel coordinate
 		column		:	IN		INTEGER;		--column pixel coordinate
@@ -66,7 +69,9 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal collide : std_logic := '0';
 	signal scoreCount : std_logic_vector(2 downto 0) := "000";
 	signal s1 : std_logic_vector(6 downto 0) := "0000001";
-
+	signal s2 : std_logic_vector(6 downto 0) := "0000001";
+	signal s3 : std_logic_vector(6 downto 0) := "0000001";
+	signal s4 : std_logic_vector(6 downto 0) := "0000001";
 		
 BEGIN
 	PROCESS(disp_ena, row, column)
@@ -250,49 +255,150 @@ BEGIN
 		
 			scoreCount <= scoreCount + 1;
 			if scoreCount = "111" then
+				
+				--setting thousands place
+				if	s3 = "0001100" and s2 = "0001100" and s1 = "0001100" then	--if tens, ones, and hundreds place is 9
+					--once the score hits 9999 it will reset to 9000
+--					if s3 = "0001100" then
+--						score3 <= "0000001";
+--						s3 <= "0000001";
+					if s4 = "0000001" then					--1000
+						score4 <= "1001111";
+						s4 <= "1001111";
+					elsif s4 = "1001111" then					--2000
+						score4 <= "0010010";
+						s4 <= "0010010";
+					elsif s4 = "0010010" then					--3000
+						score4 <= "0000110";
+						s4 <= "0000110";
+					elsif s4 = "0000110" then					--4000
+						score4 <= "1001100";
+						s4 <= "1001100";
+					elsif s4 = "1001100" then					--5000
+						score4 <= "0100100";
+						s4 <= "0100100";
+					elsif s4 = "0100100" then					--6000
+						score4 <= "0100000";
+						s4 <= "0100000";
+					elsif s4 = "0100000" then					--7000
+						score4 <= "0001111";
+						s4 <= "0001111";
+					elsif s4 = "0001111" then					--8000
+						score4 <= "0000000";
+						s4 <= "0000000";
+					elsif s4 = "0000000" then					--9000
+						score4 <= "0001100";
+						s4 <= "0001100";
+					end if;
+				end if;
+				
+				--setting hundreds place
+				if	s2 = "0001100" and s1 = "0001100" then	--if tens and ones place is 9
+					if s3 = "0001100" then						--000
+						score3 <= "0000001";
+						s3 <= "0000001";
+					elsif s3 = "0000001" then					--100
+						score3 <= "1001111";
+						s3 <= "1001111";
+					elsif s3 = "1001111" then					--200
+						score3 <= "0010010";
+						s3 <= "0010010";
+					elsif s3 = "0010010" then					--300
+						score3 <= "0000110";
+						s3 <= "0000110";
+					elsif s3 = "0000110" then					--400
+						score3 <= "1001100";
+						s3 <= "1001100";
+					elsif s3 = "1001100" then					--500
+						score3 <= "0100100";
+						s3 <= "0100100";
+					elsif s3 = "0100100" then					--600
+						score3 <= "0100000";
+						s3 <= "0100000";
+					elsif s3 = "0100000" then					--700
+						score3 <= "0001111";
+						s3 <= "0001111";
+					elsif s3 = "0001111" then					--800
+						score3 <= "0000000";
+						s3 <= "0000000";
+					elsif s3 = "0000000" then					--900
+						score3 <= "0001100";
+						s3 <= "0001100";
+					end if;
+				end if;
+				
+				--setting tens place
+				if	s1 = "0001100" then					--if ones place is 9
+					if s2 = "0001100" then				--00
+						score2 <= "0000001";
+						s2 <= "0000001";
+					elsif s2 = "0000001" then			--10
+						score2 <= "1001111";
+						s2 <= "1001111";
+					elsif s2 = "1001111" then			--20
+						score2 <= "0010010";
+						s2 <= "0010010";
+					elsif s2 = "0010010" then			--30
+						score2 <= "0000110";
+						s2 <= "0000110";
+					elsif s2 = "0000110" then			--40
+						score2 <= "1001100";
+						s2 <= "1001100";
+					elsif s2 = "1001100" then			--50
+						score2 <= "0100100";
+						s2 <= "0100100";
+					elsif s2 = "0100100" then			--60
+						score2 <= "0100000";
+						s2 <= "0100000";
+					elsif s2 = "0100000" then			--70
+						score2 <= "0001111";
+						s2 <= "0001111";
+					elsif s2 = "0001111" then			--80
+						score2 <= "0000000";
+						s2 <= "0000000";
+					elsif s2 = "0000000" then			--90
+						score2 <= "0001100";
+						s2 <= "0001100";
+					end if;
+				end if;
+				
+				--setting ones place
 				if s1 = "0001100" then				--0
 					score1 <= "0000001";
 					s1 <= "0000001";
-					--scoreCount <= "00";
+					--scoreCount <= "000";
 				elsif s1 = "0000001" then			--1
 					score1 <= "1001111";
 					s1 <= "1001111";
-					--scoreCount <= '0';
 				elsif s1 = "1001111" then			--2
 					score1 <= "0010010";
 					s1 <= "0010010";
-					--scoreCount <= '0';
 				elsif s1 = "0010010" then			--3
 					score1 <= "0000110";
 					s1 <= "0000110";
-					--scoreCount <= '0';
 				elsif s1 = "0000110" then			--4
 					score1 <= "1001100";
 					s1 <= "1001100";
-					--scoreCount <= '0';
 				elsif s1 = "1001100" then			--5
 					score1 <= "0100100";
 					s1 <= "0100100";
-					--scoreCount <= '0';
 				elsif s1 = "0100100" then			--6
 					score1 <= "0100000";
 					s1 <= "0100000";
-					--scoreCount <= '0';
 				elsif s1 = "0100000" then			--7
 					score1 <= "0001111";
 					s1 <= "0001111";
-					--scoreCount <= '0';
 				elsif s1 = "0001111" then			--8
 					score1 <= "0000000";
 					s1 <= "0000000";
-					--scoreCount <= '0';
 				elsif s1 = "0000000" then			--9
 					score1 <= "0001100";
 					s1 <= "0001100";
-					--scoreCount <= '0';
 				end if;
-			end if;
-		end if;	
+				
+			end if;	--if statement for entire scoring
+			
+		end if;		--if statement for entire process
 	end process;
 	
 	
