@@ -136,13 +136,7 @@ SYNTHESIZED_WIRE_5 <= '0';
 
 b2v_inst : hw_image_generator
 GENERIC MAP(pixels_x => 1200,  --478
-			pixels_y => 1700		--600
-			--location_x => 450,
-			--location_y => 710
-			--obj_x1 => 0,
-			--obj_y1 => 0,
-			--obj_x2 => 0,
-			--obj_y2 => 0
+			pixels_y => 1700  --600
 			)
 PORT MAP( testLED => testLED,
 			score1 => score1,
