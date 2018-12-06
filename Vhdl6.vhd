@@ -350,9 +350,6 @@ BEGIN
 				--setting thousands place
 				if	s3 = "0001100" and s2 = "0001100" and s1 = "0001100" then	--if tens, ones, and hundreds place is 9
 					--once the score hits 9999 it will reset to 9000
---					if s3 = "0001100" then
---						score3 <= "0000001";
---						s3 <= "0000001";
 					if s4 = "0000001" then					--1000
 						score4 <= "1001111";
 						s4 <= "1001111";
