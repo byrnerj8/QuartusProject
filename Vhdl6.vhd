@@ -30,9 +30,6 @@ ENTITY hw_image_generator IS
 	GENERIC(
 		pixels_y :	INTEGER := 1700; 	--bigger the y, wider the row
 		pixels_x	:	INTEGER := 1200	--bigger the x, longer the column
-		--location_x : INTEGER := 450;
-		--location_y : INTEGER := 710
-		
 		);
 		
 	PORT(
