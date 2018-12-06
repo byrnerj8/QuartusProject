@@ -79,11 +79,6 @@ ARCHITECTURE behavior OF hw_image_generator IS
 BEGIN
 	PROCESS(disp_ena, row, column)
 	BEGIN
---	  IF reset = '1' then
---			xloc <= 450;
---			yloc <= 710;
---			
---	  end if;
 		
 		IF(disp_ena = '1') THEN		--display time
 			
@@ -182,7 +177,7 @@ BEGIN
 			timer <= (OTHERS => '0');
 		end if;
 		
-         if counter < 1460 then  								--the counter randomly assigns a possition to the falling objects	 						
+         if counter < 1460 then  					--the counter randomly assigns a possition to the falling objects	 						
 																										
             counter <= counter + 1;
          else 
@@ -201,7 +196,7 @@ BEGIN
 			
    end process Prescaler;
 	
-	--testLED <= '1';
+	
 	--Process moves everything
 	PROCESS(CLK_1Hz)
 	begin
@@ -235,7 +230,7 @@ BEGIN
 			end if;
 
 	
-		 if collide = '0' then 	--we could put all of this in the process above to avoid jumping at the top of the screen
+		 if collide = '0' then 	
 			prevStart <= '0';
 			--give values for object 1
 			if e1 = '0' then																			
@@ -309,9 +304,9 @@ BEGIN
 			elsif(e2 = '1' and obj_y2 >= 1080) then	--object two is off screen
 				e2 <= '0';
 				obj_y2 <= 0;
-			else													--speed of the objects
-				obj_y1 <= obj_y1 + 6 + difficulty;--4   7						--moves object one down
-				obj_y2 <= obj_y2 + 5 + difficulty;--3						--moves object two down
+			else											--speed of the objects
+				obj_y1 <= obj_y1 + 6 + difficulty;						--moves object one down
+				obj_y2 <= obj_y2 + 5 + difficulty;						--moves object two down
 			end if;
 			
 			--moves yellow lines
@@ -517,8 +512,6 @@ BEGIN
 			END IF;
 		END IF;
 	
-	
---		IF(CLK_1HZ'EVENT AND CLK_1HZ = '1') THEN
 		IF(ps2_code_new'EVENT AND ps2_code_new = '1' AND collide = '0') THEN
 			IF(ps2_code = "00110100") THEN													--g key moves left
 				IF(xloc <= 200) THEN
