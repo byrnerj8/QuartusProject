@@ -50,12 +50,6 @@ ARCHITECTURE bdf_type OF vga_with_hw_test_image IS
 COMPONENT hw_image_generator
 GENERIC (pixels_x : INTEGER;
 			pixels_y : INTEGER
-			--location_x : INTEGER;
-			--location_y : INTEGER
-			--obj_x1 : INTEGER;
-			--obj_y1 : INTEGER;
-			--obj_x2 : INTEGER;
-			--obj_y2 : INTEGER
 			);
 			
 	PORT( testLED : OUT STD_LOGIC;
